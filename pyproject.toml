@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crop_img"
+version = "0.1.0"
+description = "Crop a 4D NIfTI image to a 3D mask's bounding box, with FSL-compatible linear transforms between the cropped and uncropped spaces."
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "nibabel",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[project.scripts]
+crop_img = "crop_img.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["crop_img*"]
