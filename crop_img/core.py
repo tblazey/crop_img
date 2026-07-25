@@ -99,10 +99,25 @@ def fsl_matrices(full_img, cropped_img):
     return crop2full, full2crop
 
 
-def crop_to_mask(in_path, mask_path, pad=0, out_path=None, out_crop2full=None, out_full2crop=None):
+def derive_output_paths(prefix):
+    """Derive (out_path, out_crop2full, out_full2crop) from a base path/prefix.
+
+    `prefix` is stripped of a trailing .nii/.nii.gz extension (if any) before
+    the standard suffixes are appended; if it has no NIfTI extension, .nii.gz
+    is assumed for the cropped image.
+    """
+    base, ext = _splitext(prefix)
+    ext = ext or ".nii.gz"
+    return f"{base}_cropped{ext}", f"{base}_crop2full.mat", f"{base}_full2crop.mat"
+
+
+def crop_to_mask(in_path, mask_path, pad=0, out_path=None, out_crop2full=None, out_full2crop=None, out_prefix=None):
     """Crop `in_path` to the padded bounding box of `mask_path` and write outputs.
 
     pad: int or (px, py, pz) tuple, in voxels.
+    out_prefix: base path used to derive all three output paths (see
+        `derive_output_paths`); defaults to `in_path`. Ignored for any output
+        whose path is given explicitly via out_path/out_crop2full/out_full2crop.
     Returns (cropped_img_path, crop2full_path, full2crop_path).
     """
     img = nib.load(in_path)
@@ -111,10 +126,10 @@ def crop_to_mask(in_path, mask_path, pad=0, out_path=None, out_crop2full=None, o
     cropped_img, starts, stops = crop_image(img, mask_img, pad=pad)
     crop2full, full2crop = fsl_matrices(img, cropped_img)
 
-    base, ext = _splitext(in_path)
-    out_path = out_path or f"{base}_cropped{ext}"
-    out_crop2full = out_crop2full or f"{base}_crop2full.mat"
-    out_full2crop = out_full2crop or f"{base}_full2crop.mat"
+    default_path, default_crop2full, default_full2crop = derive_output_paths(out_prefix or in_path)
+    out_path = out_path or default_path
+    out_crop2full = out_crop2full or default_crop2full
+    out_full2crop = out_full2crop or default_full2crop
 
     nib.save(cropped_img, out_path)
     np.savetxt(out_crop2full, crop2full, fmt="%.10g")

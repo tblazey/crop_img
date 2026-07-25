@@ -28,11 +28,15 @@ or without installing:
 python -m crop_img.cli func4d.nii.gz brainmask.nii.gz --pad 5
 ```
 
-`in_path`/`mask_path` are positional; there is no way to override the output
-paths from the CLI — it always writes `<in_path>_cropped.nii.gz`,
-`<in_path>_crop2full.mat`, and `<in_path>_full2crop.mat`. The underlying
-`crop_to_mask()` function still accepts `out_path`/`out_crop2full`/`out_full2crop`
-for programmatic use; only the CLI wrapper omits them.
+`in_path`/`mask_path` are positional. Outputs are always named
+`<out>_cropped.nii.gz`, `<out>_crop2full.mat`, and `<out>_full2crop.mat`,
+where `<out>` defaults to `in_path` but can be overridden with `--out` (a
+single base path/prefix applied to all three outputs) — e.g. `crop_img
+func4d.nii.gz brainmask.nii.gz --out results/sub01`. The underlying
+`crop_to_mask()` function accepts the same prefix via `out_prefix`, plus
+`out_path`/`out_crop2full`/`out_full2crop` to override individual output
+paths directly for programmatic use; only the CLI wrapper omits the
+per-file overrides.
 
 `tests/test_flirt_roundtrip.py` requires a real FSL install (`flirt` on `PATH`) and is
 auto-skipped otherwise — no mocking is used for that test, since it exists specifically
