@@ -1,8 +1,9 @@
 """Command-line interface for crop_img."""
 
 import argparse
+import json
 
-from crop_img.core import crop_to_mask
+from crop_img.core import _splitext, crop_to_mask
 
 
 def main():
@@ -39,6 +40,12 @@ def main():
         pad = tuple(args.pad)
     else:
         parser.error("--pad takes either 1 or 3 values")
+
+    # Record the arguments this run was invoked with, alongside the other
+    # <out>-prefixed outputs.
+    base, _ext = _splitext(args.out_prefix or args.in_path)
+    with open(f"{base}_args.json", "w", encoding="utf-8") as f:
+        json.dump(vars(args), f, indent=2)
 
     crop_to_mask(args.in_path, args.mask_path, pad=pad, out_prefix=args.out_prefix)
 

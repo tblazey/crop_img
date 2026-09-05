@@ -29,14 +29,17 @@ python -m crop_img.cli func4d.nii.gz brainmask.nii.gz --pad 5
 ```
 
 `in_path`/`mask_path` are positional. Outputs are always named
-`<out>_cropped.nii.gz`, `<out>_crop2full.mat`, and `<out>_full2crop.mat`,
+`<out>_cropped.nii.gz`, `<out>_crop2full.mat`, `<out>_full2crop.mat`, and
+`<out>_args.json` (a record of the parsed CLI arguments, for provenance),
 where `<out>` defaults to `in_path` but can be overridden with `--out` (a
-single base path/prefix applied to all three outputs) — e.g. `crop_img
+single base path/prefix applied to all outputs) — e.g. `crop_img
 func4d.nii.gz brainmask.nii.gz --out results/sub01`. The underlying
 `crop_to_mask()` function accepts the same prefix via `out_prefix`, plus
 `out_path`/`out_crop2full`/`out_full2crop` to override individual output
 paths directly for programmatic use; only the CLI wrapper omits the
-per-file overrides.
+per-file overrides. `<out>_args.json` is written by `cli.py` itself (not
+`crop_to_mask()`), using the same `_splitext`-based prefix logic as
+`derive_output_paths()` in `core.py`.
 
 `tests/test_flirt_roundtrip.py` requires a real FSL install (`flirt` on `PATH`) and is
 auto-skipped otherwise — no mocking is used for that test, since it exists specifically
